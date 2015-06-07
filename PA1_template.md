@@ -1,4 +1,10 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    fig_caption: yes
+    keep_md: yes
+---
 
 ## Introduction
 
@@ -31,16 +37,14 @@ A custom function checks if the file has exists in the working directory. If it 
 
 ```r
 if (!file.exists("activity.zip")) {
-  download.file(url = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",
-                destfile = "activity.zip")
+  download.file(url = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", destfile = "activity.zip")
 }
 
 if (!file.exists("activity.csv")) {
   unzip(zipfile = "activity.zip", files = "activity.csv")
 }
 
-activity <- read.csv(file = "activity.csv", 
-                     head= T, sep = ",", stringsAsFactors = F)
+activity <- read.csv(file = "activity.csv", head= T, sep = ",", stringsAsFactors = F)
 activity$date <- as.Date(activity$date, format = "%Y-%m-%d")
 ```
 
@@ -68,7 +72,7 @@ hist(x = steps.sum$steps,
      ylab = "Frequency", xlab = "Total Steps per Day")
 ```
 
-<img src="PA1_template_files/figure-html/Mean Steps-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="figure/Mean Steps-1.png" title="plot of chunk Mean Steps" alt="plot of chunk Mean Steps" style="display: block; margin: auto;" />
 
 3. Calculate and report the mean and median of the total number of steps taken per day
 
@@ -84,9 +88,9 @@ kable(steps.summary, align = "c")
 
 
 
-   Mean      Median 
-----------  --------
- 10766.19    10765  
+|   Mean   | Median |
+|:--------:|:------:|
+| 10766.19 | 10765  |
 
 ## What is the average daily activity pattern?
 
@@ -102,7 +106,7 @@ with(data = steps.interval, plot(x = interval, y = steps,
                                  ylab = "Average number of steps taken"))
 ```
 
-<img src="PA1_template_files/figure-html/Interval-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="figure/Interval-1.png" title="plot of chunk Interval" alt="plot of chunk Interval" style="display: block; margin: auto;" />
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -111,9 +115,11 @@ with(data = steps.interval, plot(x = interval, y = steps,
 kable(steps.interval[which.max(steps.interval$steps), ], align = "c", digits = 2)
 ```
 
-       interval    steps  
-----  ----------  --------
-104      835       206.17 
+
+
+|    | interval | steps  |
+|:---|:--------:|:------:|
+|104 |   835    | 206.17 |
 
 ## Imputing missing values
 
@@ -153,7 +159,7 @@ hist(x = steps.sum2$steps,
      ylab = "Frequency", xlab = "Total Steps per Day")
 ```
 
-<img src="PA1_template_files/figure-html/Histogram impute-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="figure/Histogram impute-1.png" title="plot of chunk Histogram impute" alt="plot of chunk Histogram impute" style="display: block; margin: auto;" />
 
 Since mean is used to impute for missing values, there are no differences in the average of the original and imputed data sets; the median, on the other hand, shows approximately 1.19 difference.
 
@@ -166,9 +172,40 @@ rownames(steps.difference) <- c("Original", "Imputed")
 kable(steps.difference, align = "c")
 ```
 
-              Mean       Median  
----------  ----------  ----------
-Original    10766.19    10765.00 
-Imputed     10766.19    10766.19 
+
+
+|         |   Mean   |  Median  |
+|:--------|:--------:|:--------:|
+|Original | 10766.19 | 10765.00 |
+|Imputed  | 10766.19 | 10766.19 |
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+For this part the `weekdays()` function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+
+```r
+activity2$day <- weekdays(as.Date(activity2$date))
+activity2$day[activity2$day  %in% c('Saturday','Sunday') ] <- "Weekend"
+activity2$day[activity2$day != "Weekend"] <- "Weekday"
+```
+
+2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+Further statistical testing is needed to determine if the differences in steps are significant between the Weekday and the Weekend.
+
+
+```r
+require(ggplot2)
+steps.interval2 <- aggregate(steps ~ interval + day, data = activity2, FUN = mean)
+ggplot(steps.interval2, aes(x = interval, y = steps, col = day)) + 
+  geom_line() +
+  xlab("Interval") + ylab("Steps") +
+  facet_wrap(~ day, nrow = 2) + 
+  theme_light() + theme(legend.position = "none")
+```
+
+<img src="figure/Facet-1.png" title="plot of chunk Facet" alt="plot of chunk Facet" style="display: block; margin: auto;" />
+

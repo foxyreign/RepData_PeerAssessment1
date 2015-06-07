@@ -36,16 +36,14 @@ A custom function checks if the file has exists in the working directory. If it 
 
 ```{r Data Set, echo=TRUE, cache=TRUE}
 if (!file.exists("activity.zip")) {
-  download.file(url = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",
-                destfile = "activity.zip")
+  download.file(url = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", destfile = "activity.zip")
 }
 
 if (!file.exists("activity.csv")) {
   unzip(zipfile = "activity.zip", files = "activity.csv")
 }
 
-activity <- read.csv(file = "activity.csv", 
-                     head= T, sep = ",", stringsAsFactors = F)
+activity <- read.csv(file = "activity.csv", head= T, sep = ",", stringsAsFactors = F)
 activity$date <- as.Date(activity$date, format = "%Y-%m-%d")
 ```
 
@@ -149,4 +147,27 @@ kable(steps.difference, align = "c")
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+For this part the `weekdays()` function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+```{r Weekday, echo=TRUE}
+activity2$day <- weekdays(as.Date(activity2$date))
+activity2$day[activity2$day  %in% c('Saturday','Sunday') ] <- "Weekend"
+activity2$day[activity2$day != "Weekend"] <- "Weekday"
+```
+
+2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+Further statistical testing is needed to determine if the differences in steps are significant between the Weekday and the Weekend.
+
+```{r Facet, echo=TRUE, fig.align='center', message=FALSE}
+require(ggplot2)
+steps.interval2 <- aggregate(steps ~ interval + day, data = activity2, FUN = mean)
+ggplot(steps.interval2, aes(x = interval, y = steps, col = day)) + 
+  geom_line() +
+  xlab("Interval") + ylab("Steps") +
+  facet_wrap(~ day, nrow = 2) + 
+  theme_light() + theme(legend.position = "none")
+```
 
