@@ -22,17 +22,71 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ## Loading and preprocessing the data
 
+Show any code that is needed to
+
+1. Load the data (i.e. `read.csv()`)
+
+A custom function checks if the file has exists in the working directory. If it is not, it downloads the file from the source. Then, it unzips the file into the working directory.
+
+
 ```r
-dataset <- read.csv(unzip("repdata-data-activity.zip"), head = T, sep = ",", stringsAsFactors = F)
-dataset$date <- as.Date(dataset$date, format = "%Y-%m-%d")
+if (!file.exists("activity.zip")) {
+  download.file(url = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",
+                destfile = "activity.zip")
+}
+
+if (!file.exists("activity.csv")) {
+  unzip(zipfile = "activity.zip", files = "activity.csv")
+}
+
+activity <- read.csv(file = "activity.csv", 
+                     head= T, sep = ",", stringsAsFactors = F)
+activity$date <- as.Date(activity$date, format = "%Y-%m-%d")
 ```
+
+2. Process/transform the data (if necessary) into a format suitable for your analysis
 
 Only **date** is transformed into date format.
 
-
 ## What is mean total number of steps taken per day?
 
+For this part of the assignment, you can ignore the missing values in the dataset.
 
+1. Calculate the total number of steps taken per day
+
+
+```r
+steps.sum <- aggregate(steps ~ date, data = activity, FUN = sum)
+```
+
+2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
+
+
+```r
+hist(x = steps.sum$steps, 
+     main = "Histogram of the total number of steps\ntaken each day", 
+     ylab = "Frequency", xlab = "Total Steps per Day")
+```
+
+![](PA1_template_files/figure-html/Mean Steps-1.png) 
+
+3. Calculate and report the mean and median of the total number of steps taken per day
+
+`kable` from `knitr` is used to tabulate the mean and median steps.
+
+
+```r
+require(knitr)
+steps.mean <- mean(steps.sum$steps); steps.median <- median(steps.sum$steps)
+steps.summary <- cbind(Mean = steps.mean, Median = steps.median)
+kable(steps.summary, align = "c")
+```
+
+
+
+   Mean      Median 
+----------  --------
+ 10766.19    10765  
 
 ## What is the average daily activity pattern?
 
