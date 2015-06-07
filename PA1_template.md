@@ -90,7 +90,30 @@ kable(steps.summary, align = "c")
 
 ## What is the average daily activity pattern?
 
+1. Make a time series plot (i.e. `type = “l”`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
+
+```r
+steps.interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
+with(data = steps.interval, plot(x = interval, y = steps, 
+                                 type = "l", 
+                                 main = NULL,
+                                 xlab = "Interval",
+                                 ylab = "Average number of steps taken"))
+```
+
+<img src="PA1_template_files/figure-html/Interval-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+
+```r
+kable(steps.interval[which.max(steps.interval$steps), ], align = "c", digits = 2)
+```
+
+       interval    steps  
+----  ----------  --------
+104      835       206.17 
 
 ## Imputing missing values
 

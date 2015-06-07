@@ -65,7 +65,7 @@ steps.sum <- aggregate(steps ~ date, data = activity, FUN = sum)
 
 2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
 
-```{r Mean Steps, echo=TRUE}
+```{r Mean Steps, echo=TRUE, fig.align='center'}
 hist(x = steps.sum$steps, 
      main = "Histogram of the total number of steps\ntaken each day", 
      ylab = "Frequency", xlab = "Total Steps per Day")
@@ -84,7 +84,22 @@ kable(steps.summary, align = "c")
 
 ## What is the average daily activity pattern?
 
+1. Make a time series plot (i.e. `type = “l”`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
+```{r Interval, echo=TRUE, fig.align='center'}
+steps.interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
+with(data = steps.interval, plot(x = interval, y = steps, 
+                                 type = "l", 
+                                 main = NULL,
+                                 xlab = "Interval",
+                                 ylab = "Average number of steps taken"))
+```
+
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```{r Max steps, message=FALSE, echo=TRUE}
+kable(steps.interval[which.max(steps.interval$steps), ], align = "c", digits = 2)
+```
 
 ## Imputing missing values
 
