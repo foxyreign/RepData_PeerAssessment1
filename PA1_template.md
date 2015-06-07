@@ -68,7 +68,7 @@ hist(x = steps.sum$steps,
      ylab = "Frequency", xlab = "Total Steps per Day")
 ```
 
-![](PA1_template_files/figure-html/Mean Steps-1.png) 
+<img src="PA1_template_files/figure-html/Mean Steps-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 3. Calculate and report the mean and median of the total number of steps taken per day
 
@@ -117,6 +117,58 @@ kable(steps.interval[which.max(steps.interval$steps), ], align = "c", digits = 2
 
 ## Imputing missing values
 
+Note that there are a number of days/intervals where there are missing values (coded as `NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
 
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with `NA`s)
+
+
+```r
+missingvalues <- sum(is.na(activity))
+```
+
+There are **2304** missing values.
+
+2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+The code replaces `NA`s with the average of steps; this is also called col-wise operation.
+
+
+```r
+activity2 <- activity
+activity2$steps[is.na(activity2$steps)] <- mean(activity2$steps, na.rm = T)
+```
+
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+See the code above. This new data set is the **activity2**.
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+
+```r
+steps.sum2 <- aggregate(steps ~ date, data = activity2, FUN = sum)
+hist(x = steps.sum2$steps, 
+     main = "Histogram of the total number of steps
+     taken each day (Imputed values)",
+     ylab = "Frequency", xlab = "Total Steps per Day")
+```
+
+<img src="PA1_template_files/figure-html/Histogram impute-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+Since mean is used to impute for missing values, there are no differences in the average of the original and imputed data sets; the median, on the other hand, shows approximately 1.19 difference.
+
+
+```r
+steps.mean2 <- mean(steps.sum2$steps); steps.median2 <- median(steps.sum2$steps)
+steps.summary2 <- cbind(Mean = steps.mean2, Median = steps.median2)
+steps.difference <- rbind(steps.summary, steps.summary2)
+rownames(steps.difference) <- c("Original", "Imputed")
+kable(steps.difference, align = "c")
+```
+
+              Mean       Median  
+---------  ----------  ----------
+Original    10766.19    10765.00 
+Imputed     10766.19    10766.19 
 
 ## Are there differences in activity patterns between weekdays and weekends?
