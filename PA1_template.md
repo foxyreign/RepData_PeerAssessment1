@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Introduction
 
@@ -26,7 +21,8 @@ The variables included in this dataset are:
 The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
 
 ## Loading and preprocessing the data
-```{r Data Set, echo=TRUE}
+
+```r
 dataset <- read.csv(unzip("repdata-data-activity.zip"), head = T, sep = ",", stringsAsFactors = F)
 dataset$date <- as.Date(dataset$date, format = "%Y-%m-%d")
 ```
